@@ -21,7 +21,7 @@ export const AHORROPAY_ABI = [
   { type: "function", name: "claimPayout", inputs: [{ name: "circleId", type: "uint256" }], outputs: [], stateMutability: "nonpayable" },
   { type: "function", name: "contribute", inputs: [{ name: "circleId", type: "uint256" }], outputs: [], stateMutability: "nonpayable" },
   { type: "function", name: "createCircle", inputs: [
-    { name: "amountPerRound", type: "uint256" }, { name: "duration", type: "uint256" }, { name: "maxMembers", type: "uint256" }
+    { name: "amountPerRound", type: "uint96" }, { name: "duration", type: "uint32" }, { name: "maxMembers", type: "uint8" }
   ], outputs: [{ name: "circleId", type: "uint256" }], stateMutability: "nonpayable" },
   { type: "function", name: "dispute", inputs: [{ name: "circleId", type: "uint256" }], outputs: [], stateMutability: "nonpayable" },
   { type: "function", name: "getCircle", inputs: [{ name: "circleId", type: "uint256" }], outputs: [
