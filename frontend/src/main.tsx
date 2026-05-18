@@ -20,15 +20,17 @@ const queryClient = new QueryClient();
 
 function Root() {
   const { address, isConnected } = useAccount();
-  const { connect } = useConnect();
+  const { connect, connectors } = useConnect();
   const { disconnect } = useDisconnect();
 
   useEffect(() => {
     const isMiniPay = typeof window !== "undefined" && (window as any).ethereum?.isMiniPay;
     if (isMiniPay && !isConnected) {
-      connect();
+      connect({ connector: connectors[0] });
     }
-  }, [connect, isConnected]);
+  }, [connect, connectors, isConnected]);
+
+  const handleConnect = () => connect({ connector: connectors[0] });
 
   return (
     <div>
@@ -54,7 +56,7 @@ function Root() {
               {address.slice(0, 6)}...{address.slice(-4)}
             </button>
           ) : (
-            <button onClick={() => connect()} style={{
+            <button onClick={handleConnect} style={{
               padding: "8px 16px",
               borderRadius: 8,
               border: "none",
@@ -67,9 +69,80 @@ function Root() {
           )}
         </div>
       </header>
-      <main style={{ padding: "24px", maxWidth: 600, margin: "0 auto" }}>
-        {isConnected ? <App /> : <p style={{ textAlign: "center", color: "#888" }}>Conecta tu wallet para empezar</p>}
-      </main>
+
+      {isConnected ? (
+        <main style={{ padding: "24px", maxWidth: 600, margin: "0 auto" }}>
+          <App />
+        </main>
+      ) : (
+        <main style={{ padding: "48px 24px", maxWidth: 600, margin: "0 auto", textAlign: "center" }}>
+          <div style={{ fontSize: 48, marginBottom: 16 }}>💰</div>
+          <h2 style={{ color: "#fff", fontSize: 28, margin: "0 0 12px" }}>
+            AhorroPay
+          </h2>
+          <p style={{ color: "#aaa", fontSize: 18, margin: "0 0 32px", lineHeight: 1.6 }}>
+            Círculos de ahorro grupales en Celo.
+            <br />
+            La tanda digital, segura y transparente.
+          </p>
+
+          <div style={{ display: "flex", flexDirection: "column", gap: 16, marginBottom: 36 }}>
+            {[
+              { step: "1", title: "Crea un círculo", desc: "Define el monto, la duración y los participantes" },
+              { step: "2", title: "Invita miembros", desc: "Cada quien se une con su wallet y contribuye" },
+              { step: "3", title: "Recibe tu tanda", desc: "Por turnos, cada miembro cobra el pozo completo" },
+            ].map((item) => (
+              <div key={item.step} style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 16,
+                background: "#1a1a2e",
+                borderRadius: 12,
+                padding: "16px 20px",
+                textAlign: "left",
+              }}>
+                <div style={{
+                  background: "#e94560",
+                  color: "#fff",
+                  width: 32,
+                  height: 32,
+                  borderRadius: "50%",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  fontWeight: 700,
+                  fontSize: 14,
+                  flexShrink: 0,
+                }}>
+                  {item.step}
+                </div>
+                <div>
+                  <div style={{ color: "#fff", fontWeight: 600, fontSize: 15 }}>{item.title}</div>
+                  <div style={{ color: "#aaa", fontSize: 13 }}>{item.desc}</div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <button onClick={handleConnect} style={{
+            padding: "16px 40px",
+            borderRadius: 12,
+            border: "none",
+            background: "#e94560",
+            color: "#fff",
+            fontSize: 18,
+            fontWeight: 700,
+            cursor: "pointer",
+            width: "100%",
+          }}>
+            Conectar Wallet para empezar
+          </button>
+
+          <p style={{ color: "#666", fontSize: 12, marginTop: 24 }}>
+            Compatible con MiniPay, MetaMask y wallets de Celo
+          </p>
+        </main>
+      )}
     </div>
   );
 }
