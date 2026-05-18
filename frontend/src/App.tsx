@@ -1,27 +1,29 @@
 import CreateCircle from "./components/CreateCircle";
 import CircleList from "./components/CircleList";
-import Contribute from "./components/Contribute";
+import JoinContribute from "./components/JoinContribute";
 import Faucet from "./components/Faucet";
 import History from "./components/History";
 import { useState } from "react";
 
 export default function App() {
-  const [tab, setTab] = useState<"create" | "list" | "contribute" | "faucet" | "history">("create");
+  const [tab, setTab] = useState<"create" | "list" | "join" | "faucet" | "history">("create");
 
   return (
     <div>
-      <div style={{
-        display: "flex",
-        gap: 8,
-        marginBottom: 24,
-        background: "#1a1a2e",
-        borderRadius: 12,
-        padding: 4,
-      }}>
+      <div
+        style={{
+          display: "flex",
+          gap: 8,
+          marginBottom: 24,
+          background: "#1a1a2e",
+          borderRadius: 12,
+          padding: 4,
+        }}
+      >
         {[
           { key: "create", label: "Crear" },
           { key: "list", label: "Mis Círculos" },
-          { key: "contribute", label: "Contribuir" },
+          { key: "join", label: "Unirse/Contribuir" },
           { key: "history", label: "Historial" },
           { key: "faucet", label: "Faucet" },
         ].map((t) => (
@@ -48,7 +50,7 @@ export default function App() {
 
       {tab === "create" && <CreateCircle />}
       {tab === "list" && <CircleList />}
-      {tab === "contribute" && <Contribute circleId={0n} />}
+      {tab === "join" && <JoinContribute />}
       {tab === "faucet" && <Faucet />}
       {tab === "history" && <History />}
     </div>

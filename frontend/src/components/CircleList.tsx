@@ -1,14 +1,19 @@
+import { useState } from "react";
 import { useReadContract, useAccount, useChainId } from "wagmi";
 import { getAhorroPayAddress, AHORROPAY_ABI } from "../contract";
 
 const STATE_LABELS = ["Pendiente", "Activo", "Completado", "Disputa"];
 const STATE_COLORS: Record<string, string> = {
-  Pendiente: "#f0c040", Activo: "#4caf50", Completado: "#888", Disputa: "#e94560",
+  Pendiente: "#f0c040",
+  Activo: "#4caf50",
+  Completado: "#888",
+  Disputa: "#e94560",
 };
 
 export default function CircleList() {
   const chainId = useChainId();
   const { address } = useAccount();
+  const [copiedId, setCopiedId] = useState<string | null>(null);
 
   const { data: circleIds } = useReadContract({
     address: getAhorroPayAddress(chainId),
@@ -20,6 +25,12 @@ export default function CircleList() {
 
   const ids = circleIds ? Array.from(circleIds) : [];
 
+  const copyId = (id: string) => {
+    navigator.clipboard.writeText(id);
+    setCopiedId(id);
+    setTimeout(() => setCopiedId(null), 2000);
+  };
+
   return (
     <div>
       <h3 style={{ margin: "0 0 16px", color: "#e94560" }}>Mis Círculos</h3>
@@ -27,7 +38,29 @@ export default function CircleList() {
         <p style={{ color: "#888" }}>No tienes círculos aún.</p>
       ) : (
         <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-          {ids.map((id) => <CircleCard key={id.toString()} circleId={id} />)}
+          {ids.map((id) => (
+            <div key={id.toString()}>
+              <CircleCard circleId={id} />
+              <button
+                onClick={() => copyId(id.toString())}
+                style={{
+                  marginTop: 8,
+                  padding: "8px 12px",
+                  borderRadius: 8,
+                  border: "1px solid #333",
+                  background: "transparent",
+                  color: copiedId === id.toString() ? "#4caf50" : "#aaa",
+                  cursor: "pointer",
+                  fontSize: 12,
+                  width: "100%",
+                }}
+              >
+                {copiedId === id.toString()
+                  ? "ID copiado!"
+                  : `Copiar ID #${id.toString()} para invitar`}
+              </button>
+            </div>
+          ))}
         </div>
       )}
     </div>
@@ -45,25 +78,59 @@ function CircleCard({ circleId }: { circleId: bigint }) {
   });
 
   if (!circle) return null;
-  const [creator, amount, , maxMembers, memberCount, currentRound, , receiver, state] = circle as any;
+  const [, amount, , maxMembers, memberCount, currentRound, , receiver, state] = circle as any;
   const label = STATE_LABELS[Number(state)] || "Desconocido";
 
   return (
-    <div style={{ background: "#1a1a2e", borderRadius: 12, padding: 16, border: "1px solid #333" }}>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
-        <span style={{ color: "#fff", fontWeight: 600 }}>Circulo #{circleId.toString()}</span>
-        <span style={{ color: STATE_COLORS[label], background: `${STATE_COLORS[label]}20`, padding: "4px 10px", borderRadius: 20, fontSize: 12, fontWeight: 600 }}>
+    <div
+      style={{
+        background: "#1a1a2e",
+        borderRadius: 12,
+        padding: 16,
+        border: "1px solid #333",
+      }}
+    >
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          marginBottom: 8,
+        }}
+      >
+        <span style={{ color: "#fff", fontWeight: 600 }}>
+          Circulo #{circleId.toString()}
+        </span>
+        <span
+          style={{
+            color: STATE_COLORS[label],
+            background: `${STATE_COLORS[label]}20`,
+            padding: "4px 10px",
+            borderRadius: 20,
+            fontSize: 12,
+            fontWeight: 600,
+          }}
+        >
           {label}
         </span>
       </div>
       <div style={{ fontSize: 14, color: "#aaa", lineHeight: 1.8 }}>
-        <div>Monto: <strong>{Number(amount) / 1e18} USDm</strong></div>
-        <div>Miembros: <strong>{Number(memberCount)}/{Number(maxMembers)}</strong></div>
+        <div>
+          Monto: <strong>{Number(amount) / 1e18} USDm</strong>
+        </div>
+        <div>
+          Miembros: <strong>{Number(memberCount)}/{Number(maxMembers)}</strong>
+        </div>
         {Number(state) === 1 && (
           <div>
-            Ronda: <strong>{Number(currentRound) + 1}/{Number(memberCount)}</strong>
+            Ronda:{" "}
+            <strong>
+              {Number(currentRound) + 1}/{Number(memberCount)}
+            </strong>
             {address?.toLowerCase() === (receiver as string)?.toLowerCase() && (
-              <span style={{ color: "#4caf50", marginLeft: 8 }}>Es tu turno</span>
+              <span style={{ color: "#4caf50", marginLeft: 8 }}>
+                Es tu turno
+              </span>
             )}
           </div>
         )}
