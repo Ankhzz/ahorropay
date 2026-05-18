@@ -2,10 +2,11 @@ import CreateCircle from "./components/CreateCircle";
 import CircleList from "./components/CircleList";
 import Contribute from "./components/Contribute";
 import Faucet from "./components/Faucet";
+import History from "./components/History";
 import { useState } from "react";
 
 export default function App() {
-  const [tab, setTab] = useState<"create" | "list" | "contribute" | "faucet">("create");
+  const [tab, setTab] = useState<"create" | "list" | "contribute" | "faucet" | "history">("create");
 
   return (
     <div>
@@ -21,6 +22,7 @@ export default function App() {
           { key: "create", label: "Crear" },
           { key: "list", label: "Mis Círculos" },
           { key: "contribute", label: "Contribuir" },
+          { key: "history", label: "Historial" },
           { key: "faucet", label: "Faucet" },
         ].map((t) => (
           <button
@@ -48,6 +50,7 @@ export default function App() {
       {tab === "list" && <CircleList />}
       {tab === "contribute" && <Contribute circleId={0n} />}
       {tab === "faucet" && <Faucet />}
+      {tab === "history" && <History />}
     </div>
   );
 }
